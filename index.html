@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christmas & Holiday Music Prompt Engine PRO</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0b1912;color:#e6edf3;padding:20px;min-height:100vh}
+.container{max-width:1200px;margin:auto}
+h1{font-size:1.8rem;color:#f0fdf4;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.subtitle{color:#86efac;font-size:.9rem;margin-bottom:24px}
+.card{background:#13261d;padding:22px;border-radius:14px;margin-bottom:18px;border:1px solid #1f3d2f}
+.card h3{font-size:1.05rem;color:#bbf7d0;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+label{display:block;font-size:.78rem;color:#86efac;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+select,input{width:100%;padding:10px 14px;background:#0b1912;border:1px solid #1f3d2f;border-radius:8px;color:#e6edf3;font-size:.9rem;outline:none;transition:border .2s}
+select:focus,input:focus{border-color:#22c55e}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+
+/* Nichos Natalinos */
+.niche-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:8px}
+.niche-card{background:#0b1912;border:2px solid #1f3d2f;border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;user-select:none}
+.niche-card:hover{border-color:#22c55e}
+.niche-card.selected{border-color:#22c55e;background:#052e16}
+.niche-card .niche-icon{font-size:1.5rem;margin-bottom:6px}
+.niche-card .niche-name{font-size:.9rem;font-weight:bold;color:#f0fdf4}
+.niche-card .niche-vol{font-size:.72rem;color:#86efac;margin-top:4px}
+
+.bpm-badge{display:inline-flex;align-items:center;gap:6px;background:#0b1912;border:1px solid #1f3d2f;border-radius:8px;padding:8px 14px;font-size:.83rem;color:#4ade80;font-weight:bold;margin-top:8px}
+
+.chip-grid{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 14px;border-radius:20px;background:#183528;border:1px solid #28543f;color:#86efac;font-size:.78rem;cursor:pointer;transition:all .2s;user-select:none}
+.chip:hover{border-color:#22c55e;color:#f0fdf4}
+.chip.active{background:#052e16;border-color:#22c55e;color:#4ade80;font-weight:bold}
+
+.mode-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.mode-btn{padding:9px 20px;border-radius:8px;border:1px solid #1f3d2f;background:#0b1912;color:#86efac;font-size:.85rem;cursor:pointer;transition:all .2s}
+.mode-btn.active{background:#052e16;border-color:#22c55e;color:#4ade80;font-weight:bold}
+
+.lote-control{display:flex;align-items:center;gap:12px;margin-top:8px}
+.lote-control input[type=range]{flex:1;accent-color:#22c55e;padding:0;border:none;background:transparent}
+.lote-count{font-size:1rem;font-weight:bold;color:#4ade80;min-width:30px;text-align:center}
+
+.btn-main{width:100%;padding:14px;background:#22c55e;color:#052e16;border:none;border-radius:10px;font-size:1rem;font-weight:bold;cursor:pointer;transition:background .2s,transform .1s;margin-top:6px}
+.btn-main:hover{background:#16a34a;color:#fff}
+.btn-copy{padding:7px 16px;background:#0b1912;border:1px solid #1f3d2f;border-radius:8px;color:#86efac;font-size:.78rem;cursor:pointer;transition:all .2s;margin-top:8px}
+.btn-copy:hover{background:#183528;color:#f0fdf4}
+
+.output-box{background:#0b1912;border:1px solid #1f3d2f;border-radius:10px;padding:16px;font-size:.85rem;line-height:1.7;white-space:pre-wrap;color:#bbf7d0;min-height:60px}
+.prompt-card{background:#0b1912;border:1px solid #1f3d2f;border-radius:10px;padding:14px;margin-bottom:10px}
+.prompt-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.prompt-num{font-size:.78rem;font-weight:bold;color:#4ade80}
+.prompt-text{font-size:.83rem;color:#bbf7d0;line-height:1.6;margin-bottom:8px}
+
+hr{border:none;border-top:1px solid #1f3d2f;margin:16px 0}
+.toast{position:fixed;bottom:24px;right:24px;background:#052e16;border:1px solid #22c55e;color:#bbf7d0;padding:12px 20px;border-radius:10px;font-size:.85rem;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+
+@media(max-width:768px){.grid2,.grid3,.grid4{grid-template-columns:1fr}.niche-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🎄 Christmas & Holiday Prompt Engine <span style="font-size:1rem;color:#4ade80;font-weight:normal">PRO</span></h1>
+<p class="subtitle">Gere prompts sazonais otimizados para Suno/Udio focados em Christmas Jazz, Classic Carols, Cozy Fireplace e Lofi Festivo</p>
+
+<!-- ① NICHO NATALINO -->
+<div class="card">
+  <h3>① Sub-Nicho Festivo Principal</h3>
+  <div class="niche-grid" id="nicheGrid"></div>
+  <div class="bpm-badge" id="bpmBadge" style="display:none">
+    🎵 Tempo & Atmosfera: <span id="bpmValue">—</span>
+  </div>
+</div>
+
+<!-- ② CONFIGURAÇÃO DE INSTRUMENTOS E TEXTURAS DE NATAL -->
+<div class="card">
+  <h3>② Instrumentação & Textura Festiva</h3>
+  <div class="grid3" style="margin-bottom:14px">
+    <div class="field">
+      <label>Instrumento Principal (Lead)</label>
+      <select id="lead"></select>
+    </div>
+    <div class="field">
+      <label>Acompanhamento / Harmonia</label>
+      <select id="texture"></select>
+    </div>
+    <div class="field">
+      <label>Toque Festivo Especial (Sleigh Bells / Foley)</label>
+      <select id="holidayFX">
+        <option value="Subtle Sleigh Bells, Soft Winter Wind">Sleigh Bells Sutis & Vento de Inverno</option>
+        <option value="Cozy Fireplace Crackling & Soft Snow Ambience">Lareira Crepitante & Neve Suave</option>
+        <option value="Distant Church Bells & Gentle Sleigh Bells">Sinos de Igreja Distantes & Sleigh Bells</option>
+        <option value="Warm Vinyl Crackle & Subtle Holiday Chimes">Vinil Warm & Chimes Natalinos</option>
+        <option value="Pure Instrumental (No Foley FX)">Apenas Instrumental (Sem FX)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid4">
+    <div class="field">
+      <label>Timbre / Acústica</label>
+      <select id="timbre">
+        <option value="Warm Acoustic Tone, Rich Reverb, Cozy Atmosphere">Acústico Warm & Reverb Rico</option>
+        <option value="Vintage Jazz Club Vibe, Mellow Master">Jazz Club Vintage</option>
+        <option value="Sacred Cathedral Acoustics, Deep Resonance">Acústica de Catedral Sagrada</option>
+        <option value="Soft Lofi Tape Saturation, Nostalgic Warmth">Lofi Tape Saturation Nostálgica</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Sentimento / Vibe</label>
+      <select id="vibe">
+        <option value="Nostalgic & Heartwarming">Nostálgico & Acolhedor</option>
+        <option value="Magical & Winter Wonderland">Mágico & Invernoso</option>
+        <option value="Peaceful & Holy Night">Pacífico & Noite Sagrada</option>
+        <option value="Joyful & Cozy Holiday">Alegre & Festivo</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Estrutura do Prompt</label>
+      <select id="structMode">
+        <option value="Seamless Holiday Medley, Circular Harmonic Flow">Medley Festivo / Fluxo Contínuo</option>
+        <option value="Classic Song Interpretation, Slow Expressive Development">Interpretação Clássica Expressiva</option>
+        <option value="Relaxing Background Loop, Soft Repetitive Cadence">Loop Calmo para Fundo</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Duração (YouTube)</label>
+      <select id="duration">
+        <option>1 Hour</option>
+        <option selected>3 Hours</option>
+        <option>8 Hours</option>
+        <option>Single Track</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ③ MODO DE GERAÇÃO -->
+<div class="card">
+  <h3>③ Modo de Geração</h3>
+  <div class="mode-bar">
+    <button class="mode-btn active" id="modeSimple" onclick="setMode('simple')">🎄 Prompt Único</button>
+    <button class="mode-btn" id="modeLote" onclick="setMode('lote')">⚡ Gerar Álbum em Lote</button>
+  </div>
+  
+  <div id="lotePanel" style="display:none;margin-bottom:16px">
+    <label>Quantidade de Prompts para o Álbum / Playlist</label>
+    <div class="lote-control">
+      <input type="range" id="loteRange" min="2" max="20" value="10" oninput="document.getElementById('loteCount').innerText=this.value">
+      <div class="lote-count" id="loteCount">10</div>
+    </div>
+  </div>
+
+  <button class="btn-main" onclick="generate()">🎄 Gerar Prompts Festivos + SEO de Natal</button>
+</div>
+
+<!-- OUTPUTS -->
+<div id="singleOutput" style="display:none">
+  <div class="card">
+    <h3>🧠 Prompt Curto — Suno / Udio (Style Prompt)</h3>
+    <div class="output-box" id="shortPrompt"></div>
+    <button class="btn-copy" onclick="copyEl('shortPrompt')">📋 Copiar Prompt Curto</button>
+  </div>
+
+  <div class="card">
+    <h3>🧠 Prompt Detalhado — Instrumentação & Atmosfera Natalina</h3>
+    <div class="output-box" id="longPrompt"></div>
+    <button class="btn-copy" onclick="copyEl('longPrompt')">📋 Copiar Prompt Detalhado</button>
+  </div>
+
+  <div class="card">
+    <h3>🚫 Negative Prompt</h3>
+    <div class="output-box" id="negPrompt"></div>
+    <button class="btn-copy" onclick="copyEl('negPrompt')">📋 Copiar Negative Prompt</button>
+  </div>
+
+  <div class="card">
+    <h3>🏷️ Títulos YouTube / Spotify Otimizados para Natal</h3>
+    <div class="output-box" id="ytTitles"></div>
+    <button class="btn-copy" onclick="copyEl('ytTitles')">📋 Copiar Títulos</button>
+  </div>
+
+  <div class="card">
+    <h3>📄 Descrição SEO — YouTube (Foco Sazonal)</h3>
+    <div class="output-box" id="seoDesc"></div>
+    <button class="btn-copy" onclick="copyEl('seoDesc')">📋 Copiar Descrição SEO</button>
+  </div>
+</div>
+
+<div id="loteOutput" style="display:none">
+  <div class="card">
+    <h3>⚡ Álbum / Playlist de Natal Gerada em Lote</h3>
+    <div id="loteList"></div>
+  </div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const NICHES = {
+  "Christmas Jazz": {
+    icon: "🎷", vol: "Buscas: 🔥 1.18M+ (Alto Faturamento)", bpm: "65–80 BPM (Slow Swing)",
+    bpmNote: "Jazz suave com piano, escovinhas e clima acolhedor de inverno",
+    mood: "warm, sophisticated, festive, cozy, smooth jazz, holiday cheer",
+    arrangement: "Cozy holiday jazz instrumental arrangement featuring mellow piano chords, soft brush drums, upright bass, and subtle festive touches.",
+    leads: ["Jazz Piano", "Soft Saxophone", "Hollowbody Jazz Guitar", "Rhodes Piano"],
+    textures: ["Brush Snare Drums", "Upright Bass", "Soft String Pads"],
+    negative: "no vocals, no aggressive horns, no heavy pop drums, no fast bebop solo, no distorted synths",
+    keywords: ["christmas jazz", "jazz christmas music", "relaxing christmas jazz", "cozy holiday jazz", "coffee shop christmas jazz"],
+    ytTitles: [
+      "🎄 Cozy Christmas Jazz — Relaxing Holiday Music & Fireplace | {dur}",
+      "☕ Christmas Jazz Cafe — Smooth {lead} & Fireplace Ambience | {dur}",
+      "🎷 Relaxing Christmas Jazz Instrumental for Study & Work | {dur}",
+      "❄️ Warm Holiday Jazz Music — Soft Piano & Saxophone | {dur}"
+    ],
+    seo: "Relaxing Christmas jazz instrumental music featuring cozy {lead} and {holidayFX}. The ultimate background music for holiday decorating, relaxing, studying, and cozy winter evenings."
+  },
+  "Classic Christmas Songs": {
+    icon: "🎻", vol: "Buscas: 🔥 2.47M+ (Alto Engajamento)", bpm: "55–70 BPM (Adagio / Andante)",
+    bpmNote: "Versões instrumentais eruditas e emocionantes de canções tradicionais (Silent Night, O Holy Night)",
+    mood: "nostalgic, sacred, heartwarming, emotional, timeless, peaceful",
+    arrangement: "Heartwarming instrumental interpretation of classic Christmas carols and holiday songs. Rich classical orchestration, expressive phrasing, and peaceful cadence.",
+    leads: ["Concert Grand Piano", "Solo Cello", "Baroque Violin", "Classical Harp", "Chamber String Ensemble"],
+    textures: ["Soft Orchestral Strings", "Warm Cathedral Reverb", "Subtle Choir Pad"],
+    negative: "no modern pop beats, no electronic synths, no harsh brass, no vocals, no upbeat dance tempo",
+    keywords: ["classic christmas songs", "christmas carols instrumental", "silent night instrumental", "traditional christmas music", "classical christmas piano"],
+    ytTitles: [
+      "🎻 Classic Christmas Songs — Peaceful Instrumental Carols | {dur}",
+      "✨ Traditional Christmas Carols — Piano & Strings Instrumental | {dur}",
+      "🕯️ Silent Night & Classic Christmas Instrumental for Peace | {dur}",
+      "❄️ Nostalgic Classical Christmas Music — Solo {lead} | {dur}"
+    ],
+    seo: "Peaceful instrumental versions of classic Christmas songs and traditional carols. Featuring {lead} with {texture} and {holidayFX} for a nostalgic, heartwarming holiday season."
+  },
+  "Cozy Fireplace Christmas": {
+    icon: "🔥", vol: "Buscas: 🔥 3.9M+ (Retenção Máxima)", bpm: "45–60 BPM (Very Slow)",
+    bpmNote: "Foco total em sono, descanso e noites frias de inverno ao pé da lareira",
+    mood: "deeply comforting, sleepy, magical, warm, peaceful, safe",
+    arrangement: "Ultra-soft and comforting holiday instrumental designed for deep relaxation, sleep, and cozy nights by the fireplace.",
+    leads: ["Soft Grand Piano", "Classical Harp", "Warm Acoustic Guitar", "Ambient Synth Pad"],
+    textures: ["Cozy Fireplace Crackling", "Deep Soft Drones", "Gentle Wind Sounds"],
+    negative: "no drums, no loud crescendos, no fast notes, no harsh sounds, no vocals",
+    keywords: ["fireplace christmas music", "cozy christmas sleep", "relaxing christmas ambient", "sleepy holiday piano", "winter fireplace music"],
+    ytTitles: [
+      "🔥 Cozy Christmas by the Fireplace — Sleep & Relaxation Music | {dur}",
+      "💤 Sleepy Christmas Piano & Fireplace Crackling | {dur}",
+      "🌙 Magical Winter Night — Soft Holiday Music for Deep Rest | {dur}"
+    ],
+    seo: "Cozy Christmas music accompanied by real fireplace crackling sounds. Soft {lead} designed for deep relaxation, sleep, and comforting winter nights."
+  },
+  "Lofi Christmas Beats": {
+    icon: "🎧", vol: "Buscas: 🔥 19M+ Global (Alta Demanda Jovem)", bpm: "70–85 BPM (Chill Lo-Fi)",
+    bpmNote: "Batidas relaxantes de lofi hip hop misturadas com temas natalinos nostálgicos",
+    mood: "chill, nostalgic, aesthetic, cozy, sleepy beats, moody winter",
+    arrangement: "Cozy lofi hip hop beats with muffled vinyl crackle, warm sub bass, gentle jazzy chords, and subtle holiday melodies.",
+    leads: ["Muffled Lofi Piano", "Rhodes Electric Piano", "Soft Acoustic Guitar", "Lofi Trumpet"],
+    textures: ["Vinyl Crackle Texture", "Soft Boom Bap Beats", "Sub Bass Warmth"],
+    negative: "no heavy trap drums, no harsh high frequencies, no aggressive rapping, no pop vocals",
+    keywords: ["christmas lofi", "lofi christmas beats", "chill holiday lofi", "study christmas lofi", "cozy lofi winter"],
+    ytTitles: [
+      "🎧 Lofi Christmas Beats — Cozy Holiday Music to Study & Relax | {dur}",
+      "☕ Christmas Lofi Hip Hop — Chill Piano & Snow Ambience | {dur}",
+      "❄️ Aesthetic Lofi Winter Wonderland — Relaxing Beats | {dur}"
+    ],
+    seo: "Cozy lofi Christmas beats with muffled {lead}, vinyl crackle, and soft percussion. Perfect background music for studying, working, and relaxing during the holidays."
+  }
+};
+
+let currentNiche = "Christmas Jazz";
+let currentMode = "simple";
+
+function init() {
+  const grid = document.getElementById("nicheGrid");
+  grid.innerHTML = "";
+  Object.keys(NICHES).forEach(key => {
+    const item = NICHES[key];
+    const card = document.createElement("div");
+    card.className = `niche-card ${key === currentNiche ? 'selected' : ''}`;
+    card.onclick = () => selectNiche(key);
+    card.innerHTML = `<div class="niche-icon">${item.icon}</div><div class="niche-name">${key}</div><div class="niche-vol">${item.vol}</div>`;
+    grid.appendChild(card);
+  });
+  renderSelects();
+  selectNiche(currentNiche);
+}
+
+function selectNiche(key) {
+  currentNiche = key;
+  document.querySelectorAll(".niche-card").forEach(c => {
+    c.classList.toggle("selected", c.querySelector(".niche-name").innerText === key);
+  });
+  const data = NICHES[key];
+  document.getElementById("bpmBadge").style.display = "inline-flex";
+  document.getElementById("bpmValue").innerText = data.bpm;
+  renderSelects();
+}
+
+function renderSelects() {
+  const data = NICHES[currentNiche];
+  const lead = document.getElementById("lead");
+  const texture = document.getElementById("texture");
+  lead.innerHTML = data.leads.map(i => `<option>${i}</option>`).join("");
+  texture.innerHTML = data.textures.map(i => `<option>${i}</option>`).join("");
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById("modeSimple").classList.toggle("active", mode === 'simple');
+  document.getElementById("modeLote").classList.toggle("active", mode === 'lote');
+  document.getElementById("lotePanel").style.display = mode === 'lote' ? 'block' : 'none';
+}
+
+function generate() {
+  const niche = NICHES[currentNiche];
+  const leadVal = document.getElementById("lead").value;
+  const texVal = document.getElementById("texture").value;
+  const fxVal = document.getElementById("holidayFX").value;
+  const timbreVal = document.getElementById("timbre").value;
+  const vibeVal = document.getElementById("vibe").value;
+  const durVal = document.getElementById("duration").value;
+
+  if (currentMode === "simple") {
+    document.getElementById("singleOutput").style.display = "block";
+    document.getElementById("loteOutput").style.display = "none";
+
+    const shortP = `Festive instrumental, ${leadVal}, ${texVal}, ${fxVal}, ${niche.mood}, warm holiday atmosphere, high acoustic quality, no vocals.`;
+    
+    const longP = `A heartwarming holiday instrumental composition in the style of ${currentNiche}. Lead instrument: ${leadVal}. Secondary backing: ${texVal}. Festive environmental layer: ${fxVal}. Acoustic quality: ${timbreVal}. Overall emotional vibe: ${vibeVal}. Arrangement flows smoothly as a continuous background soundtrack for winter and Christmas seasons.`;
+
+    document.getElementById("shortPrompt").innerText = shortP;
+    document.getElementById("longPrompt").innerText = longP;
+    document.getElementById("negPrompt").innerText = niche.negative;
+
+    const titles = niche.ytTitles.map(t => t.replace("{dur}", durVal).replace("{lead}", leadVal)).join("\n");
+    document.getElementById("ytTitles").innerText = titles;
+
+    const seo = niche.seo.replace("{lead}", leadVal).replace("{texture}", texVal).replace("{holidayFX}", fxVal);
+    document.getElementById("seoDesc").innerText = seo;
+  } else {
+    document.getElementById("singleOutput").style.display = "none";
+    document.getElementById("loteOutput").style.display = "block";
+
+    const count = parseInt(document.getElementById("loteRange").value);
+    const list = document.getElementById("loteList");
+    list.innerHTML = "";
+
+    for (let i = 1; i <= count; i++) {
+      const card = document.createElement("div");
+      card.className = "prompt-card";
+      const pText = `Holiday instrumental track Vol. ${i} — ${currentNiche}. Lead: ${leadVal}, Texture: ${texVal}. FX: ${fxVal}. Mood: ${niche.mood}. Warm festive sound, high quality, no vocals.`;
+      card.innerHTML = `
+        <div class="prompt-card-header">
+          <span class="prompt-num">#${i} - ${currentNiche}</span>
+        </div>
+        <div class="prompt-text">${pText}</div>
+        <button class="btn-copy" onclick="copyText('${pText}')">📋 Copiar Prompt</button>
+      `;
+      list.appendChild(card);
+    }
+  }
+}
+
+function copyEl(id) {
+  const text = document.getElementById(id).innerText;
+  copyText(text);
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text);
+  const toast = document.getElementById("toast");
+  toast.innerText = "Copiado para a área de transferência!";
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2000);
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
